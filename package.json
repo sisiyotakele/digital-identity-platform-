@@ -1,0 +1,9 @@
+{
+  "name": "digital-identity-platform",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Digital Identity Platform - Monorepo",
+  "keywords": [],
+  "author": "",
+  "license": "MIT"
+}
