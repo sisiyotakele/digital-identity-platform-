@@ -1,56 +1,86 @@
 'use client'
 
 import { motion } from 'framer-motion'
+import Link from 'next/link'
+import { Button } from '@/components/ui/button'
+import { ArrowRight } from 'lucide-react'
 
 const templates = [
-    { name: 'Minimal', bg: 'bg-white', accent: '#111827', preview: 'border border-slate-200' },
-    { name: 'Modern', bg: 'bg-slate-50', accent: '#3B82F6', preview: '' },
-    { name: 'Executive', bg: 'bg-neutral-950', accent: '#FBBF24', preview: '' },
-    { name: 'Dark', bg: 'bg-zinc-900', accent: '#22D3EE', preview: '' },
-    { name: 'Gradient', bg: 'bg-gradient-to-br from-indigo-50 to-white', accent: '#6366F1', preview: '' },
-    { name: 'Startup', bg: 'bg-white', accent: '#10B981', preview: '' },
-    { name: 'Corporate', bg: 'bg-white', accent: '#1B4F8A', preview: 'border border-slate-200' },
-    { name: 'Creative', bg: 'bg-white', accent: '#7C3AED', preview: '' },
+    { name: 'Modern', accent: '#3B82F6', bg: 'from-blue-500 to-blue-600', dark: false },
+    { name: 'Executive', accent: '#1C1917', bg: 'from-stone-800 to-stone-900', dark: true },
+    { name: 'Creative', accent: '#7C3AED', bg: 'from-violet-500 to-purple-600', dark: false },
+    { name: 'Startup', accent: '#10B981', bg: 'from-emerald-500 to-emerald-600', dark: false },
+    { name: 'Gradient', accent: '#6366F1', bg: 'from-indigo-500 to-violet-500', dark: false },
+    { name: 'Dark', accent: '#22D3EE', bg: 'from-zinc-800 to-zinc-900', dark: true },
+    { name: 'Corporate', accent: '#1B4F8A', bg: 'from-blue-800 to-blue-900', dark: true },
+    { name: 'Minimal', accent: '#6B7280', bg: 'from-gray-100 to-gray-200', dark: false },
 ]
 
 export function LandingTemplates() {
     return (
-        <section id="templates" className="py-20 px-4 sm:px-6 bg-slate-50">
-            <div className="max-w-6xl mx-auto">
-                <div className="text-center mb-14">
-                    <h2 className="text-3xl font-bold tracking-tight">8 beautiful templates</h2>
-                    <p className="text-muted-foreground mt-3 max-w-md mx-auto">
-                        Every template is optimised for mobile and looks great on any device or screen size
+        <section id="templates" className="py-28 px-4 sm:px-6 bg-gray-50 dark:bg-gray-900/50">
+            <div className="max-w-7xl mx-auto">
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    className="text-center mb-16"
+                >
+                    <span className="inline-block text-xs font-bold uppercase tracking-[0.2em] text-blue-600 dark:text-blue-400 mb-3">
+                        8 designs
+                    </span>
+                    <h2 className="text-4xl sm:text-5xl font-black text-gray-900 dark:text-white tracking-tight">
+                        Premium templates for every professional
+                    </h2>
+                    <p className="text-xl text-gray-500 dark:text-gray-400 mt-4 max-w-lg mx-auto">
+                        Every template is designed to make you look your best — on screen and in print.
                     </p>
-                </div>
+                </motion.div>
 
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-12">
                     {templates.map((t, i) => (
                         <motion.div
                             key={t.name}
                             initial={{ opacity: 0, scale: 0.95 }}
                             whileInView={{ opacity: 1, scale: 1 }}
                             viewport={{ once: true }}
-                            transition={{ delay: i * 0.05 }}
+                            transition={{ delay: i * 0.04 }}
+                            whileHover={{ y: -6, transition: { duration: 0.2 } }}
                             className="group cursor-pointer"
                         >
-                            <div className={`rounded-2xl h-40 ${t.bg} ${t.preview} overflow-hidden shadow-sm group-hover:shadow-md transition-shadow relative`}>
-                                <div
-                                    className="absolute inset-x-0 top-0 h-16 opacity-90"
-                                    style={{ background: `linear-gradient(135deg, ${t.accent}cc, ${t.accent})` }}
-                                />
-                                <div className="absolute top-12 left-4">
-                                    <div className="size-10 rounded-xl bg-white shadow" />
+                            <div className="rounded-2xl overflow-hidden shadow-sm group-hover:shadow-xl transition-shadow duration-300">
+                                {/* Card mockup */}
+                                <div className={`h-44 bg-gradient-to-br ${t.bg} relative p-4`}>
+                                    {/* Header bar */}
+                                    <div className="flex items-center justify-between mb-3">
+                                        <div className={`text-xs font-black tracking-wider ${t.dark ? 'text-white/70' : 'text-white/90'}`}>UNIQUE</div>
+                                        <div className={`size-6 rounded-full ${t.dark ? 'bg-white/10' : 'bg-white/20'}`} />
+                                    </div>
+                                    {/* Avatar */}
+                                    <div className={`size-10 rounded-xl ${t.dark ? 'bg-white/10' : 'bg-white/30'} mb-2`} />
+                                    {/* Name lines */}
+                                    <div className={`h-2.5 rounded w-20 mb-1.5 ${t.dark ? 'bg-white/20' : 'bg-white/70'}`} />
+                                    <div className={`h-1.5 rounded w-14 mb-3 ${t.dark ? 'bg-white/10' : 'bg-white/50'}`} />
+                                    {/* Button */}
+                                    <div className={`h-6 rounded-lg w-full ${t.dark ? 'bg-white/10' : 'bg-white/30'}`} />
                                 </div>
-                                <div className="absolute top-24 left-4 right-4 space-y-1.5">
-                                    <div className="h-2.5 rounded bg-current opacity-10 w-2/3" />
-                                    <div className="h-2 rounded bg-current opacity-10 w-1/2" />
-                                    <div className="h-7 rounded-lg mt-3" style={{ backgroundColor: `${t.accent}20` }} />
+                                {/* Name label */}
+                                <div className="bg-white dark:bg-gray-800 px-4 py-2.5 flex items-center justify-between">
+                                    <span className="text-xs font-semibold text-gray-700 dark:text-gray-300">{t.name}</span>
+                                    <div className="size-4 rounded-full" style={{ backgroundColor: t.accent }} />
                                 </div>
                             </div>
-                            <p className="text-xs font-medium text-center mt-2 text-muted-foreground group-hover:text-foreground transition-colors">{t.name}</p>
                         </motion.div>
                     ))}
+                </div>
+
+                <div className="text-center">
+                    <Link href="/register">
+                        <Button size="lg" className="h-12 px-8 font-semibold bg-gradient-to-r from-blue-600 to-violet-600 border-0 text-white hover:opacity-90 gap-2">
+                            Try all templates free
+                            <ArrowRight className="size-5" />
+                        </Button>
+                    </Link>
                 </div>
             </div>
         </section>

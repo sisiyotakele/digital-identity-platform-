@@ -88,7 +88,7 @@ export default function ForgotPasswordPage() {
                                 <FormItem>
                                     <FormLabel>Email</FormLabel>
                                     <FormControl>
-                                        <Input type="email" placeholder="you@example.com" {...field} />
+                                        <Input type="email" placeholder="abel@company.com.et" {...field} />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>

@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { toast } from 'sonner'
-import { Loader2, Users } from 'lucide-react'
+import { Loader2, Users, Download, Share2, CheckCircle2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
@@ -35,14 +35,21 @@ export function CardPublicView({ card, username }: CardPublicViewProps) {
 
     function handleContactDownload() {
         trackEvent({ card_id: card.id, event_type: 'contact_download' })
-        window.location.href = `/api/vcard?slug=${card.slug}&username=${username}`
+        // Direct link — browser handles the download via Content-Disposition header
+        const a = document.createElement('a')
+        a.href = `/api/vcard?slug=${encodeURIComponent(card.slug)}&username=${encodeURIComponent(username)}`
+        a.download = `${card.title ?? 'contact'}.vcf`
+        document.body.appendChild(a)
+        a.click()
+        document.body.removeChild(a)
+        toast.success('Contact saved to your device')
     }
 
     function handleShare() {
         trackEvent({ card_id: card.id, event_type: 'share_click' })
         const url = `${siteConfig.url}/${username}/${card.slug}`
         if (navigator.share) {
-            navigator.share({ title: card.title ?? '', url })
+            navigator.share({ title: card.title ?? 'Digital Card', text: `${card.title} — ${card.company ?? ''}`, url })
         } else {
             navigator.clipboard.writeText(url)
             toast.success('Link copied to clipboard')
@@ -81,16 +88,16 @@ export function CardPublicView({ card, username }: CardPublicViewProps) {
                 message: values.message || undefined,
             })
             setLeadSubmitted(true)
-            toast.success('Message sent')
+            toast.success('Your details have been sent')
         } catch {
-            toast.error('Failed to send message')
+            toast.error('Failed to send — please try again')
         } finally {
             setSubmitting(false)
         }
     }
 
     return (
-        <div>
+        <div className="min-h-screen">
             <CardTemplateRenderer
                 card={card}
                 onContactDownload={handleContactDownload}
@@ -101,21 +108,38 @@ export function CardPublicView({ card, username }: CardPublicViewProps) {
                 onWebsiteClick={handleWebsiteClick}
             />
 
-            <div className="max-w-sm mx-auto px-6 py-10 border-t border-border">
+            {/* Sticky download bar at bottom on mobile */}
+            <div className="sticky bottom-0 z-40 bg-white/95 dark:bg-gray-950/95 backdrop-blur border-t border-border px-4 py-3 flex gap-3 md:hidden">
+                <Button
+                    onClick={handleContactDownload}
+                    className="flex-1 gap-2 font-bold bg-gradient-to-r from-blue-600 to-violet-600 border-0 text-white hover:opacity-90 h-11"
+                >
+                    <Download className="size-4" />
+                    Save Contact
+                </Button>
+                <Button onClick={handleShare} variant="outline" className="h-11 w-11 p-0">
+                    <Share2 className="size-4" />
+                </Button>
+            </div>
+
+            {/* Lead capture section */}
+            <div className="max-w-sm mx-auto px-6 py-10 pb-20 md:pb-10 border-t border-border">
                 <div className="text-center mb-6">
-                    <div className="size-10 rounded-xl bg-primary/10 flex items-center justify-center mx-auto mb-3">
-                        <Users className="size-5 text-primary" />
+                    <div className="size-12 rounded-2xl bg-gradient-to-br from-blue-500/10 to-violet-500/10 flex items-center justify-center mx-auto mb-3">
+                        <Users className="size-6 text-blue-600" />
                     </div>
-                    <h3 className="font-semibold text-base">Leave your details</h3>
+                    <h3 className="font-bold text-base">Connect with {card.title?.split(' ')[0] ?? 'me'}</h3>
                     <p className="text-sm text-muted-foreground mt-1">
-                        {card.title ?? 'This person'} will get back to you
+                        Leave your details and they will reach out
                     </p>
                 </div>
 
                 {leadSubmitted ? (
-                    <div className="text-center py-6">
+                    <div className="text-center py-8 space-y-3">
+                        <CheckCircle2 className="size-12 text-emerald-500 mx-auto" />
+                        <p className="font-semibold">Details sent!</p>
                         <p className="text-sm text-muted-foreground">
-                            Thanks — your details have been shared.
+                            {card.title?.split(' ')[0] ?? 'They'} will get back to you soon.
                         </p>
                     </div>
                 ) : (
@@ -124,36 +148,48 @@ export function CardPublicView({ card, username }: CardPublicViewProps) {
                             <FormField control={leadForm.control} name="name" render={({ field }) => (
                                 <FormItem>
                                     <FormLabel>Your name</FormLabel>
-                                    <FormControl><Input placeholder="John Smith" {...field} /></FormControl>
+                                    <FormControl>
+                                        <Input placeholder="Dawit Bekele" className="h-11" {...field} />
+                                    </FormControl>
                                     <FormMessage />
                                 </FormItem>
                             )} />
 
                             <FormField control={leadForm.control} name="email" render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Email <span className="text-muted-foreground font-normal">(optional)</span></FormLabel>
-                                    <FormControl><Input type="email" placeholder="john@email.com" {...field} /></FormControl>
+                                    <FormLabel>Email <span className="text-muted-foreground font-normal text-xs">(optional)</span></FormLabel>
+                                    <FormControl>
+                                        <Input type="email" placeholder="dawit@company.com.et" className="h-11" {...field} />
+                                    </FormControl>
                                     <FormMessage />
                                 </FormItem>
                             )} />
 
                             <FormField control={leadForm.control} name="phone" render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Phone <span className="text-muted-foreground font-normal">(optional)</span></FormLabel>
-                                    <FormControl><Input type="tel" placeholder="+1 234 567 8900" {...field} /></FormControl>
+                                    <FormLabel>Phone <span className="text-muted-foreground font-normal text-xs">(optional)</span></FormLabel>
+                                    <FormControl>
+                                        <Input type="tel" placeholder="+251 91 234 5678" className="h-11" {...field} />
+                                    </FormControl>
                                     <FormMessage />
                                 </FormItem>
                             )} />
 
                             <FormField control={leadForm.control} name="message" render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Message <span className="text-muted-foreground font-normal">(optional)</span></FormLabel>
-                                    <FormControl><Textarea placeholder="I would love to connect…" rows={3} {...field} /></FormControl>
+                                    <FormLabel>Message <span className="text-muted-foreground font-normal text-xs">(optional)</span></FormLabel>
+                                    <FormControl>
+                                        <Textarea placeholder="I would love to connect…" rows={3} {...field} />
+                                    </FormControl>
                                     <FormMessage />
                                 </FormItem>
                             )} />
 
-                            <Button type="submit" className="w-full" disabled={submitting}>
+                            <Button
+                                type="submit"
+                                className="w-full h-11 font-bold bg-gradient-to-r from-blue-600 to-violet-600 border-0 text-white hover:opacity-90"
+                                disabled={submitting}
+                            >
                                 {submitting && <Loader2 className="mr-2 size-4 animate-spin" />}
                                 Send my details
                             </Button>

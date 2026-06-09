@@ -195,7 +195,7 @@ export default function SettingsPage() {
                         <FormField control={profileForm.control} name="display_name" render={({ field }) => (
                             <FormItem>
                                 <FormLabel>Display name</FormLabel>
-                                <FormControl><Input placeholder="Jane Doe" {...field} /></FormControl>
+                                <FormControl><Input placeholder="Abel Abebe" {...field} /></FormControl>
                                 <FormMessage />
                             </FormItem>
                         )} />
@@ -208,7 +208,7 @@ export default function SettingsPage() {
                                         <span className="absolute left-3 top-2 text-sm text-muted-foreground">@</span>
                                         <Input
                                             className="pl-7"
-                                            placeholder="janedoe"
+                                            placeholder="abelabebe"
                                             {...field}
                                             onChange={(e) => {
                                                 field.onChange(e)

@@ -1,10 +1,11 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import { Toaster } from 'sonner'
+import { ThemeProvider } from '@/components/providers/ThemeProvider'
 import './globals.css'
 import { siteConfig } from '@/config/site'
 
-const inter = Inter({ subsets: ['latin'] })
+const inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
 
 export const metadata: Metadata = {
     title: {
@@ -30,16 +31,19 @@ export const metadata: Metadata = {
     },
 }
 
-export default function RootLayout({
-    children,
-}: {
-    children: React.ReactNode
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
     return (
-        <html lang="en" suppressHydrationWarning>
-            <body className={inter.className}>
-                {children}
-                <Toaster richColors position="top-right" />
+        <html lang="en" suppressHydrationWarning className={inter.variable}>
+            <body className="font-sans antialiased">
+                <ThemeProvider
+                    attribute="class"
+                    defaultTheme="light"
+                    enableSystem
+                    disableTransitionOnChange={false}
+                >
+                    {children}
+                    <Toaster richColors position="top-right" />
+                </ThemeProvider>
             </body>
         </html>
     )

@@ -1,9 +1,12 @@
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
-import { Plus, CreditCard, BarChart2, Eye } from 'lucide-react'
+import { Plus, ArrowRight, Zap } from 'lucide-react'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { DashboardStats } from '@/components/dashboard/DashboardStats'
+import { RecentCards } from '@/components/dashboard/RecentCards'
+import { QuickActions } from '@/components/dashboard/QuickActions'
+import type { Stat } from '@/components/dashboard/DashboardStats'
 
 export const metadata = { title: 'Dashboard' }
 
@@ -12,123 +15,116 @@ export default async function DashboardPage() {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) redirect('/login')
 
-    const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single()
-    const { data: cards } = await supabase.from('business_cards').select('id, title, slug, is_active, created_at').eq('user_id', user.id)
-    const cardIds = (cards ?? []).map((c) => c.id)
+    const { data: profile } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', user.id)
+        .single()
 
+    const { data: cards } = await supabase
+        .from('business_cards')
+        .select('id, title, slug, is_active, template, created_at, theme_color')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+
+    const cardIds = (cards ?? []).map((c) => c.id)
     let totalViews = 0
+    let totalDownloads = 0
+    let totalClicks = 0
+
     if (cardIds.length > 0) {
-        const { count } = await supabase
-            .from('analytics_events')
-            .select('id', { count: 'exact', head: true })
-            .in('card_id', cardIds)
-            .eq('event_type', 'card_view')
-        totalViews = count ?? 0
+        const [{ count: v }, { count: d }, { count: c }] = await Promise.all([
+            supabase
+                .from('analytics_events')
+                .select('id', { count: 'exact', head: true })
+                .in('card_id', cardIds)
+                .eq('event_type', 'card_view'),
+            supabase
+                .from('analytics_events')
+                .select('id', { count: 'exact', head: true })
+                .in('card_id', cardIds)
+                .eq('event_type', 'contact_download'),
+            supabase
+                .from('analytics_events')
+                .select('id', { count: 'exact', head: true })
+                .in('card_id', cardIds)
+                .eq('event_type', 'link_click'),
+        ])
+        totalViews = v ?? 0
+        totalDownloads = d ?? 0
+        totalClicks = c ?? 0
     }
 
     const displayName = profile?.display_name ?? user.email?.split('@')[0] ?? 'there'
     const activeCards = (cards ?? []).filter((c) => c.is_active).length
+    const hasUsername = !!profile?.username
+
+    const stats: Stat[] = [
+        { label: 'Total Views', value: totalViews, key: 'views', change: 'All time' },
+        { label: 'Cards', value: (cards ?? []).length, key: 'cards', change: `${activeCards} active` },
+        { label: 'Contacts Saved', value: totalDownloads, key: 'downloads', change: 'All time' },
+        { label: 'Link Clicks', value: totalClicks, key: 'clicks', change: 'All time' },
+    ]
+
+    const hour = new Date().getHours()
+    const greeting = hour < 12 ? 'morning' : hour < 17 ? 'afternoon' : 'evening'
 
     return (
-        <div className="p-6 md:p-8 max-w-6xl mx-auto space-y-8">
-            <div>
-                <h1 className="text-2xl font-semibold">Welcome back, {displayName}</h1>
-                <p className="text-sm text-muted-foreground mt-1">Here is a snapshot of your digital presence</p>
+        <div className="p-5 md:p-8 max-w-7xl mx-auto space-y-8">
+            <div className="flex items-start justify-between gap-4">
+                <div>
+                    <h1 className="text-2xl font-bold">
+                        Good {greeting}, {displayName} 👋
+                    </h1>
+                    <p className="text-sm text-muted-foreground mt-1">
+                        {(cards ?? []).length === 0
+                            ? 'Create your first digital business card to get started'
+                            : `You have ${activeCards} active card${activeCards !== 1 ? 's' : ''} — here's your overview`}
+                    </p>
+                </div>
+                <Link href="/cards/create">
+                    <Button className="gap-2 shadow-sm shrink-0">
+                        <Plus className="size-4" />
+                        <span className="hidden sm:inline">New card</span>
+                    </Button>
+                </Link>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <Card>
-                    <CardHeader className="flex flex-row items-center justify-between pb-2">
-                        <CardTitle className="text-sm font-medium text-muted-foreground">Total cards</CardTitle>
-                        <CreditCard className="size-4 text-muted-foreground" />
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold">{(cards ?? []).length}</div>
-                        <p className="text-xs text-muted-foreground mt-1">{activeCards} active</p>
-                    </CardContent>
-                </Card>
-
-                <Card>
-                    <CardHeader className="flex flex-row items-center justify-between pb-2">
-                        <CardTitle className="text-sm font-medium text-muted-foreground">Total views</CardTitle>
-                        <Eye className="size-4 text-muted-foreground" />
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold">{totalViews}</div>
-                        <p className="text-xs text-muted-foreground mt-1">All time</p>
-                    </CardContent>
-                </Card>
-
-                <Card>
-                    <CardHeader className="flex flex-row items-center justify-between pb-2">
-                        <CardTitle className="text-sm font-medium text-muted-foreground">Analytics</CardTitle>
-                        <BarChart2 className="size-4 text-muted-foreground" />
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold">
-                            <Link href="/analytics" className="hover:underline">
-                                View all
-                            </Link>
+            {!hasUsername && (
+                <div className="rounded-2xl border border-primary/20 bg-primary/5 p-4 flex items-center justify-between gap-4">
+                    <div className="flex items-center gap-3">
+                        <div className="size-9 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+                            <Zap className="size-5 text-primary" />
                         </div>
-                        <p className="text-xs text-muted-foreground mt-1">Detailed insights</p>
-                    </CardContent>
-                </Card>
-            </div>
-
-            <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                    <h2 className="text-base font-semibold">Your cards</h2>
-                    <Link href="/cards/create">
-                        <Button size="sm">
-                            <Plus className="size-4 mr-1.5" />
-                            New card
+                        <div>
+                            <p className="text-sm font-semibold">Set your username to go live</p>
+                            <p className="text-xs text-muted-foreground">Your public URL will be {'{yourname}'}.cardconnect.app</p>
+                        </div>
+                    </div>
+                    <Link href="/settings">
+                        <Button size="sm" variant="outline" className="shrink-0">
+                            Set username
+                            <ArrowRight className="size-3 ml-1.5" />
                         </Button>
                     </Link>
                 </div>
+            )}
 
-                {(cards ?? []).length === 0 ? (
-                    <Card>
-                        <CardContent className="py-12 text-center">
-                            <CreditCard className="size-10 text-muted-foreground mx-auto mb-3" />
-                            <p className="font-medium mb-1">No cards yet</p>
-                            <p className="text-sm text-muted-foreground mb-4">Create your first digital business card</p>
-                            <Link href="/cards/create">
-                                <Button>
-                                    <Plus className="size-4 mr-1.5" />
-                                    Create card
-                                </Button>
-                            </Link>
-                        </CardContent>
-                    </Card>
-                ) : (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {(cards ?? []).slice(0, 6).map((card) => (
-                            <Link key={card.id} href={`/cards/${card.id}/edit`}>
-                                <Card className="hover:shadow-md transition-shadow cursor-pointer">
-                                    <CardContent className="p-4">
-                                        <div className="flex items-start justify-between">
-                                            <div>
-                                                <p className="font-medium text-sm">{card.title ?? 'Untitled card'}</p>
-                                                <p className="text-xs text-muted-foreground mt-0.5">/{card.slug}</p>
-                                            </div>
-                                            <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${card.is_active ? 'bg-green-100 text-green-700' : 'bg-muted text-muted-foreground'}`}>
-                                                {card.is_active ? 'Active' : 'Inactive'}
-                                            </span>
-                                        </div>
-                                    </CardContent>
-                                </Card>
-                            </Link>
-                        ))}
-                    </div>
-                )}
+            <DashboardStats stats={stats} />
 
-                {(cards ?? []).length > 6 && (
-                    <div className="text-center">
-                        <Link href="/cards">
-                            <Button variant="outline" size="sm">View all cards</Button>
-                        </Link>
-                    </div>
-                )}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div className="lg:col-span-2">
+                    <RecentCards
+                        cards={cards ?? []}
+                        username={profile?.username ?? null}
+                    />
+                </div>
+                <div>
+                    <QuickActions
+                        hasCards={(cards ?? []).length > 0}
+                        username={profile?.username ?? null}
+                    />
+                </div>
             </div>
         </div>
     )

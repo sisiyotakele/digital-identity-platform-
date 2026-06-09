@@ -1,8 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import { createClient } from '@/lib/supabase/client'
-import { LIMITS } from '@/lib/constants'
 
 interface UploadOptions {
     bucket: 'avatars' | 'card-media'
@@ -14,51 +12,56 @@ export function useUpload() {
     const [progress, setProgress] = useState(0)
 
     async function upload(file: File, options: UploadOptions): Promise<string> {
-        if (!(LIMITS.SUPPORTED_IMAGE_TYPES as readonly string[]).includes(file.type)) {
+        const ALLOWED = ['image/jpeg', 'image/png', 'image/webp', 'image/gif']
+        if (!ALLOWED.includes(file.type)) {
             throw new Error('Unsupported file type. Use JPEG, PNG, or WebP.')
         }
-
-        const maxBytes = options.bucket === 'avatars'
-            ? LIMITS.MAX_PHOTO_SIZE_MB * 1024 * 1024
-            : LIMITS.MAX_LOGO_SIZE_MB * 1024 * 1024
-
-        if (file.size > maxBytes) {
-            throw new Error(`File too large. Max size is ${options.bucket === 'avatars' ? LIMITS.MAX_PHOTO_SIZE_MB : LIMITS.MAX_LOGO_SIZE_MB}MB.`)
+        if (file.size > 5 * 1024 * 1024) {
+            throw new Error('File too large. Max size is 5MB.')
         }
 
         setUploading(true)
-        setProgress(10)
+        setProgress(20)
 
         try {
-            const { default: imageCompression } = await import('browser-image-compression')
-            const compressed = await imageCompression(file, {
-                maxSizeMB: 1,
-                maxWidthOrHeight: 1200,
-                useWebWorker: true,
-                onProgress: (p) => setProgress(10 + Math.floor(p * 0.7)),
+            // Optionally compress before sending
+            let fileToUpload = file
+            try {
+                const { default: imageCompression } = await import('browser-image-compression')
+                fileToUpload = await imageCompression(file, {
+                    maxSizeMB: 1,
+                    maxWidthOrHeight: 1200,
+                    useWebWorker: true,
+                    onProgress: (p) => setProgress(20 + Math.floor(p * 0.5)),
+                })
+            } catch {
+                // Compression failed — use original file
+            }
+
+            setProgress(75)
+
+            const formData = new FormData()
+            formData.append('file', fileToUpload)
+            formData.append('bucket', options.bucket)
+            if (options.folder) formData.append('folder', options.folder)
+
+            const response = await fetch('/api/upload', {
+                method: 'POST',
+                body: formData,
             })
 
-            setProgress(80)
+            const data = await response.json() as { url?: string; error?: string }
 
-            const supabase = createClient()
-            const { data: { user } } = await supabase.auth.getUser()
-            if (!user) throw new Error('Not authenticated')
+            if (!response.ok) {
+                throw new Error(data.error ?? `Upload failed (${response.status})`)
+            }
 
-            const ext = file.name.split('.').pop() ?? 'jpg'
-            const folder = options.folder ?? user.id
-            const path = `${folder}/${Date.now()}.${ext}`
-
-            const { error } = await supabase.storage.from(options.bucket).upload(path, compressed, {
-                cacheControl: '3600',
-                upsert: false,
-            })
-
-            if (error) throw new Error(error.message)
-
-            const { data: { publicUrl } } = supabase.storage.from(options.bucket).getPublicUrl(path)
+            if (!data.url) {
+                throw new Error('No URL returned from upload')
+            }
 
             setProgress(100)
-            return publicUrl
+            return data.url
         } finally {
             setUploading(false)
             setProgress(0)

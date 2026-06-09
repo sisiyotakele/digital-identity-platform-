@@ -1,24 +1,106 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
-import { renderToBuffer } from '@react-pdf/renderer'
-import { Document, Page, View, Text, StyleSheet } from '@react-pdf/renderer'
+import { renderToBuffer, Document, Page, View, Text, StyleSheet, Svg, Path } from '@react-pdf/renderer'
 
 const styles = StyleSheet.create({
-    page: { padding: 40, backgroundColor: '#ffffff', fontFamily: 'Helvetica' },
-    name: { fontSize: 20, fontFamily: 'Helvetica-Bold', color: '#111827' },
-    company: { fontSize: 12, color: '#6B7280', marginTop: 4 },
-    section: { marginTop: 16 },
-    label: {
-        fontSize: 8,
+    page: {
+        backgroundColor: '#ffffff',
+        fontFamily: 'Helvetica',
+        padding: 0,
+    },
+    // Top accent bar
+    header: {
+        height: 8,
+        backgroundColor: '#3B82F6',
+    },
+    body: {
+        padding: '32 40 40 40',
+    },
+    nameRow: {
+        flexDirection: 'row',
+        alignItems: 'flex-start',
+        marginBottom: 20,
+    },
+    nameBlock: {
+        flex: 1,
+    },
+    name: {
+        fontSize: 22,
+        fontFamily: 'Helvetica-Bold',
+        color: '#111827',
+        lineHeight: 1.2,
+    },
+    title: {
+        fontSize: 12,
+        color: '#3B82F6',
+        marginTop: 3,
+        fontFamily: 'Helvetica-Bold',
+    },
+    company: {
+        fontSize: 11,
+        color: '#6B7280',
+        marginTop: 2,
+    },
+    divider: {
+        height: 1,
+        backgroundColor: '#E5E7EB',
+        marginVertical: 16,
+    },
+    bioText: {
+        fontSize: 10,
+        color: '#6B7280',
+        lineHeight: 1.6,
+        marginBottom: 16,
+    },
+    grid: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        gap: 0,
+    },
+    fieldBlock: {
+        width: '50%',
+        marginBottom: 14,
+        paddingRight: 12,
+    },
+    fieldLabel: {
+        fontSize: 7,
         color: '#9CA3AF',
         fontFamily: 'Helvetica-Bold',
         textTransform: 'uppercase',
-        letterSpacing: 0.5,
-        marginBottom: 3,
+        letterSpacing: 0.8,
+        marginBottom: 2,
     },
-    value: { fontSize: 11, color: '#374151' },
-    bio: { fontSize: 11, color: '#6B7280', lineHeight: 1.5 },
-    divider: { borderBottom: '1 solid #E5E7EB', marginVertical: 16 },
+    fieldValue: {
+        fontSize: 10,
+        color: '#374151',
+        lineHeight: 1.4,
+    },
+    footer: {
+        position: 'absolute',
+        bottom: 20,
+        left: 40,
+        right: 40,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+    },
+    footerText: {
+        fontSize: 8,
+        color: '#D1D5DB',
+        fontFamily: 'Helvetica-Bold',
+        letterSpacing: 1,
+    },
+    footerUrl: {
+        fontSize: 8,
+        color: '#9CA3AF',
+    },
+    accentBar: {
+        height: 3,
+        backgroundColor: '#3B82F6',
+        marginBottom: 16,
+        borderRadius: 2,
+        width: 40,
+    },
 })
 
 interface CardData {
@@ -31,48 +113,76 @@ interface CardData {
     address: string | null
 }
 
-function CardPDF({ card }: { card: CardData }) {
+function CardPDF({ card, cardUrl }: { card: CardData; cardUrl: string }) {
     return (
-        <Document>
+        <Document
+            title={card.title ?? 'Business Card'}
+            author="UNIQUE Digital Card"
+            subject="Digital Business Card"
+        >
             <Page size="A4" style={styles.page}>
-                <Text style={styles.name}>{card.title ?? ''}</Text>
-                {card.company ? <Text style={styles.company}>{card.company}</Text> : null}
+                {/* Top accent */}
+                <View style={styles.header} />
 
-                <View style={styles.divider} />
-
-                {card.bio ? (
-                    <View style={styles.section}>
-                        <Text style={styles.bio}>{card.bio}</Text>
+                <View style={styles.body}>
+                    {/* Name block */}
+                    <View style={styles.nameRow}>
+                        <View style={styles.nameBlock}>
+                            <View style={styles.accentBar} />
+                            <Text style={styles.name}>{card.title ?? ''}</Text>
+                            {card.company ? <Text style={styles.company}>{card.company}</Text> : null}
+                        </View>
                     </View>
-                ) : null}
 
-                {card.email ? (
-                    <View style={styles.section}>
-                        <Text style={styles.label}>Email</Text>
-                        <Text style={styles.value}>{card.email}</Text>
-                    </View>
-                ) : null}
+                    {card.bio ? <Text style={styles.bioText}>{card.bio}</Text> : null}
 
-                {card.phone ? (
-                    <View style={styles.section}>
-                        <Text style={styles.label}>Phone</Text>
-                        <Text style={styles.value}>{card.phone}</Text>
-                    </View>
-                ) : null}
+                    <View style={styles.divider} />
 
-                {card.website ? (
-                    <View style={styles.section}>
-                        <Text style={styles.label}>Website</Text>
-                        <Text style={styles.value}>{card.website}</Text>
-                    </View>
-                ) : null}
+                    {/* Contact grid */}
+                    <View style={styles.grid}>
+                        {card.email ? (
+                            <View style={styles.fieldBlock}>
+                                <Text style={styles.fieldLabel}>Email</Text>
+                                <Text style={styles.fieldValue}>{card.email}</Text>
+                            </View>
+                        ) : null}
 
-                {card.address ? (
-                    <View style={styles.section}>
-                        <Text style={styles.label}>Address</Text>
-                        <Text style={styles.value}>{card.address}</Text>
+                        {card.phone ? (
+                            <View style={styles.fieldBlock}>
+                                <Text style={styles.fieldLabel}>Phone</Text>
+                                <Text style={styles.fieldValue}>{card.phone}</Text>
+                            </View>
+                        ) : null}
+
+                        {card.website ? (
+                            <View style={styles.fieldBlock}>
+                                <Text style={styles.fieldLabel}>Website</Text>
+                                <Text style={styles.fieldValue}>{card.website}</Text>
+                            </View>
+                        ) : null}
+
+                        {card.address ? (
+                            <View style={styles.fieldBlock}>
+                                <Text style={styles.fieldLabel}>Location</Text>
+                                <Text style={styles.fieldValue}>{card.address}</Text>
+                            </View>
+                        ) : null}
                     </View>
-                ) : null}
+
+                    <View style={styles.divider} />
+
+                    {/* Card URL */}
+                    <View style={styles.fieldBlock}>
+                        <Text style={styles.fieldLabel}>Digital Card</Text>
+                        <Text style={styles.fieldValue}>{cardUrl}</Text>
+                    </View>
+                </View>
+
+                {/* Footer */}
+                <View style={styles.footer}>
+                    <Text style={styles.footerText}>UNIQUE DIGITAL CARD</Text>
+                    <Text style={styles.footerUrl}>unique.digital</Text>
+                </View>
             </Page>
         </Document>
     )
@@ -106,13 +216,24 @@ export async function GET(request: NextRequest) {
 
     if (!card) return NextResponse.json({ error: 'Card not found' }, { status: 404 })
 
-    const buffer = await renderToBuffer(<CardPDF card={card} />)
-    const filename = (card.title ?? 'card').replace(/[^a-z0-9]/gi, '-').toLowerCase()
+    const cardUrl = `${process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'}/${username}/${slug}`
+
+    const buffer = await renderToBuffer(<CardPDF card={card} cardUrl={cardUrl} />)
+
+    // Safe ASCII filename
+    const safeFilename = (card.title ?? 'card')
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-zA-Z0-9\s-]/g, '')
+        .trim()
+        .replace(/\s+/g, '-')
+        .toLowerCase() || 'business-card'
 
     return new NextResponse(new Uint8Array(buffer), {
         headers: {
             'Content-Type': 'application/pdf',
-            'Content-Disposition': `attachment; filename="${filename}.pdf"`,
+            'Content-Disposition': `attachment; filename="${safeFilename}.pdf"`,
+            'Cache-Control': 'no-cache',
         },
     })
 }
