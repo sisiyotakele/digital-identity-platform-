@@ -41,8 +41,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
     return (
         <div className="h-screen flex overflow-hidden bg-background">
-            {/* Desktop sidebar — fixed height, never scrolls */}
-            <div className="hidden md:flex md:w-64 shrink-0 h-screen">
+            {/* Desktop sidebar — animates its own width */}
+            <div className="hidden md:flex shrink-0 h-screen">
                 <Sidebar />
             </div>
 

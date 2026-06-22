@@ -2,33 +2,9 @@
 
 import Link from 'next/link'
 import { useState, useEffect } from 'react'
-import dynamic from 'next/dynamic'
-import { motion, useScroll, useTransform } from 'framer-motion'
-import { ArrowRight, Sparkles, Shield, Zap, Users, Play, CheckCircle, CreditCard } from 'lucide-react'
+import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion'
+import { ArrowRight, Sparkles, Shield, Zap, Users, Play, CheckCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-
-// Three.js canvas — loaded client-side only
-const CardScene3DCanvas = dynamic(
-    () => import('./CardScene3D').then((m) => ({ default: m.CardScene3DCanvas })),
-    { ssr: false, loading: () => <CardSceneFallback /> }
-)
-
-function CardSceneFallback() {
-    return (
-        <div className="w-full h-[420px] sm:h-[500px] flex items-center justify-center">
-            <motion.div
-                className="relative"
-                animate={{ y: [0, -12, 0], rotateZ: [0, 2, -2, 0] }}
-                transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
-            >
-                <div className="w-72 h-44 rounded-3xl bg-gradient-to-br from-blue-600 via-violet-700 to-indigo-800 shadow-2xl shadow-blue-500/40 flex items-center justify-center">
-                    <CreditCard className="size-16 text-white/30" />
-                </div>
-                <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-white/10 to-transparent" />
-            </motion.div>
-        </div>
-    )
-}
 
 const TYPED_WORDS = ['Abel Abebe', 'Sara Tesfaye', 'Dawit Bekele', 'Hana Girma', 'Yonas Haile']
 
@@ -42,28 +18,33 @@ const PARTICLES = Array.from({ length: 25 }, (_, i) => ({
     opacity: Math.random() * 0.35 + 0.1,
 }))
 
+const BADGES = [
+    { icon: '✅', label: 'Contact Saved', sub: 'just now', pos: '-left-4 sm:-left-16 top-16' },
+    { icon: '👀', label: '247 views', sub: 'today', pos: '-right-4 sm:-right-14 top-1/3' },
+    { icon: '📡', label: 'NFC Tap!', sub: 'Card shared', pos: '-left-2 sm:-left-12 bottom-20' },
+]
+
 export function LandingHero() {
     const [typedIndex, setTypedIndex] = useState(0)
     const [displayText, setDisplayText] = useState('')
     const [isDeleting, setIsDeleting] = useState(false)
     const { scrollY } = useScroll()
-    const heroY = useTransform(scrollY, [0, 500], [0, -60])
+    const phoneY = useTransform(scrollY, [0, 400], [0, -50])
 
-    // Typewriter
     useEffect(() => {
         const word = TYPED_WORDS[typedIndex]
-        let timeout: ReturnType<typeof setTimeout>
+        let t: ReturnType<typeof setTimeout>
         if (!isDeleting && displayText.length < word.length) {
-            timeout = setTimeout(() => setDisplayText(word.slice(0, displayText.length + 1)), 80)
+            t = setTimeout(() => setDisplayText(word.slice(0, displayText.length + 1)), 80)
         } else if (!isDeleting && displayText.length === word.length) {
-            timeout = setTimeout(() => setIsDeleting(true), 2000)
+            t = setTimeout(() => setIsDeleting(true), 2000)
         } else if (isDeleting && displayText.length > 0) {
-            timeout = setTimeout(() => setDisplayText(displayText.slice(0, -1)), 40)
+            t = setTimeout(() => setDisplayText(displayText.slice(0, -1)), 40)
         } else {
             setIsDeleting(false)
             setTypedIndex((p) => (p + 1) % TYPED_WORDS.length)
         }
-        return () => clearTimeout(timeout)
+        return () => clearTimeout(t)
     }, [displayText, isDeleting, typedIndex])
 
     return (
@@ -73,15 +54,15 @@ export function LandingHero() {
             <div className="absolute inset-0 pointer-events-none overflow-hidden">
                 <motion.div
                     className="absolute -top-40 -right-40 w-[700px] h-[700px] rounded-full blur-3xl"
-                    style={{ background: 'radial-gradient(circle, rgba(99,102,241,0.16) 0%, rgba(59,130,246,0.07) 55%, transparent 80%)' }}
+                    style={{ background: 'radial-gradient(circle, rgba(99,102,241,0.18) 0%, rgba(59,130,246,0.08) 55%, transparent 80%)' }}
                     animate={{ scale: [1, 1.15, 1], rotate: [0, 80, 0] }}
-                    transition={{ duration: 24, repeat: Infinity, ease: 'easeInOut' }}
+                    transition={{ duration: 22, repeat: Infinity, ease: 'easeInOut' }}
                 />
                 <motion.div
                     className="absolute -bottom-52 -left-32 w-[600px] h-[600px] rounded-full blur-3xl"
                     style={{ background: 'radial-gradient(circle, rgba(139,92,246,0.14) 0%, rgba(99,102,241,0.06) 55%, transparent 80%)' }}
                     animate={{ scale: [1, 1.18, 1], rotate: [0, -80, 0] }}
-                    transition={{ duration: 30, repeat: Infinity, ease: 'easeInOut', delay: 5 }}
+                    transition={{ duration: 28, repeat: Infinity, ease: 'easeInOut', delay: 5 }}
                 />
                 <svg className="absolute inset-0 w-full h-full opacity-[0.025] dark:opacity-[0.04]">
                     <defs>
@@ -100,6 +81,11 @@ export function LandingHero() {
                         transition={{ duration: p.duration, repeat: Infinity, delay: p.delay, ease: 'easeInOut' }}
                     />
                 ))}
+                {/* Spinning rings */}
+                <motion.div className="absolute top-20 left-8 w-56 h-56 rounded-full border border-blue-200/15 dark:border-blue-800/15"
+                    animate={{ rotate: 360 }} transition={{ duration: 28, repeat: Infinity, ease: 'linear' }} />
+                <motion.div className="absolute bottom-24 right-8 w-40 h-40 rounded-full border border-violet-200/15 dark:border-violet-800/15"
+                    animate={{ rotate: -360 }} transition={{ duration: 20, repeat: Infinity, ease: 'linear' }} />
             </div>
 
             <div className="relative max-w-7xl mx-auto px-4 sm:px-6 py-10 lg:py-16 w-full">
@@ -120,11 +106,9 @@ export function LandingHero() {
 
                             <h1 className="text-5xl sm:text-6xl lg:text-[58px] font-black leading-[1.05] tracking-tight text-gray-900 dark:text-white">
                                 {['Make every', 'first impression', 'unforgettable.'].map((line, i) => (
-                                    <motion.span
-                                        key={line}
+                                    <motion.span key={line}
                                         className={`block ${i === 1 ? 'bg-gradient-to-r from-blue-600 via-violet-500 to-blue-600 bg-clip-text text-transparent bg-[length:200%_auto] animate-gradient' : ''}`}
-                                        initial={{ opacity: 0, x: -30 }}
-                                        animate={{ opacity: 1, x: 0 }}
+                                        initial={{ opacity: 0, x: -30 }} animate={{ opacity: 1, x: 0 }}
                                         transition={{ duration: 0.5, delay: 0.1 + i * 0.1 }}
                                     >
                                         {line}
@@ -132,22 +116,17 @@ export function LandingHero() {
                                 ))}
                             </h1>
 
-                            <motion.div
-                                initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.55 }}
-                                className="mt-4 flex items-center gap-2 text-base text-gray-500 dark:text-gray-400 flex-wrap"
-                            >
+                            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.55 }}
+                                className="mt-4 flex items-center gap-2 text-base text-gray-500 dark:text-gray-400 flex-wrap">
                                 <span>Used by</span>
                                 <span className="font-bold text-gray-900 dark:text-white min-w-[150px]">
-                                    {displayText}
-                                    <span className="animate-blink text-blue-500">|</span>
+                                    {displayText}<span className="animate-blink text-blue-500">|</span>
                                 </span>
                             </motion.div>
                         </motion.div>
 
-                        <motion.p
-                            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }}
-                            className="text-lg text-gray-500 dark:text-gray-400 leading-relaxed max-w-lg"
-                        >
+                        <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }}
+                            className="text-lg text-gray-500 dark:text-gray-400 leading-relaxed max-w-lg">
                             Create stunning digital business cards with{' '}
                             <span className="text-blue-600 dark:text-blue-400 font-semibold">NFC</span>,{' '}
                             <span className="text-violet-600 dark:text-violet-400 font-semibold">QR codes</span>, and{' '}
@@ -155,13 +134,11 @@ export function LandingHero() {
                             Share in one tap. Print premium physical cards.
                         </motion.p>
 
-                        <motion.div
-                            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.45 }}
-                            className="flex flex-wrap gap-3"
-                        >
+                        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.45 }}
+                            className="flex flex-wrap gap-3">
                             <Link href="/register">
                                 <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
-                                    <Button size="lg" className="h-13 px-8 text-base font-bold bg-gradient-to-r from-blue-600 to-violet-600 border-0 text-white shadow-xl shadow-blue-500/30 hover:shadow-blue-500/50 gap-2 rounded-xl">
+                                    <Button size="lg" className="h-13 px-8 text-base font-bold bg-gradient-to-r from-blue-600 to-violet-600 border-0 text-white shadow-xl shadow-blue-500/30 gap-2 rounded-xl">
                                         Start for free
                                         <motion.div animate={{ x: [0, 4, 0] }} transition={{ duration: 1.5, repeat: Infinity }}>
                                             <ArrowRight className="size-5" />
@@ -179,16 +156,15 @@ export function LandingHero() {
                             </Link>
                         </motion.div>
 
-                        <motion.div
-                            initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6 }}
-                            className="flex flex-wrap items-center gap-5"
-                        >
+                        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6 }}
+                            className="flex flex-wrap items-center gap-5">
                             {[
                                 { icon: Shield, label: 'No credit card', color: 'text-emerald-500' },
                                 { icon: Zap, label: 'Ready in 2 min', color: 'text-amber-500' },
                                 { icon: Users, label: '50K+ users', color: 'text-blue-500' },
                             ].map(({ icon: Icon, label, color }, i) => (
-                                <motion.div key={label} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.65 + i * 0.1 }}
+                                <motion.div key={label} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }}
+                                    transition={{ delay: 0.65 + i * 0.1 }}
                                     className="flex items-center gap-1.5 text-sm text-gray-500 dark:text-gray-400">
                                     <CheckCircle className={`size-4 ${color}`} />
                                     {label}
@@ -197,30 +173,129 @@ export function LandingHero() {
                         </motion.div>
                     </div>
 
-                    {/* Right — Three.js 3D Scene */}
-                    <motion.div style={{ y: heroY }} className="relative z-10 mt-4 lg:mt-0">
-                        <motion.div
-                            initial={{ opacity: 0, scale: 0.9 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            transition={{ duration: 0.8, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
-                        >
-                            <CardScene3DCanvas />
-                        </motion.div>
+                    {/* Right — phone mockup */}
+                    <motion.div style={{ y: phoneY }} className="relative flex justify-center lg:justify-end mt-8 lg:mt-0 z-10">
+                        <div className="relative scale-90 sm:scale-100">
+                            {/* Glow */}
+                            <motion.div
+                                className="absolute inset-0 rounded-[3rem] blur-3xl"
+                                style={{ background: 'radial-gradient(circle, rgba(99,102,241,0.35) 0%, rgba(59,130,246,0.15) 60%, transparent 80%)' }}
+                                animate={{ scale: [1, 1.1, 1], opacity: [0.6, 1, 0.6] }}
+                                transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
+                            />
+
+                            {/* Phone */}
+                            <motion.div
+                                animate={{ y: [0, -12, 0] }}
+                                transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
+                                className="relative"
+                            >
+                                <div className="relative w-[260px] sm:w-[280px] h-[520px] sm:h-[560px]">
+                                    <div className="absolute inset-0 rounded-[2.8rem] bg-gradient-to-b from-gray-800 to-gray-900 shadow-2xl shadow-black/60" />
+                                    <div className="absolute inset-[2px] rounded-[2.7rem] bg-gray-950" />
+                                    <div className="absolute top-4 left-1/2 -translate-x-1/2 w-20 h-5 bg-gray-900 rounded-full z-20" />
+
+                                    {/* Screen */}
+                                    <div className="absolute inset-[3px] rounded-[2.5rem] overflow-hidden z-10 bg-white dark:bg-gray-900">
+                                        {/* Header */}
+                                        <div className="h-32 bg-gradient-to-br from-blue-600 via-violet-600 to-indigo-700 relative overflow-hidden">
+                                            <motion.div
+                                                className="absolute inset-0"
+                                                style={{ background: 'radial-gradient(circle at 70% 50%, rgba(255,255,255,0.12) 0%, transparent 60%)' }}
+                                                animate={{ x: [-20, 20, -20] }}
+                                                transition={{ duration: 4, repeat: Infinity }}
+                                            />
+                                            <div className="absolute -bottom-10 left-6">
+                                                <motion.div
+                                                    className="size-20 rounded-2xl bg-white shadow-xl ring-4 ring-white overflow-hidden"
+                                                    animate={{ rotate: [0, 2, -2, 0] }}
+                                                    transition={{ duration: 4, repeat: Infinity }}
+                                                >
+                                                    <div className="w-full h-full bg-gradient-to-br from-blue-100 to-violet-100 flex items-center justify-center">
+                                                        <span className="text-2xl font-black text-blue-600">AA</span>
+                                                    </div>
+                                                </motion.div>
+                                            </div>
+                                            <div className="absolute top-3 right-3 bg-white/20 backdrop-blur-sm rounded-lg px-2 py-1">
+                                                <span className="text-white text-xs font-black tracking-wider">UNIQUE</span>
+                                            </div>
+                                        </div>
+
+                                        <div className="pt-12 px-5 space-y-3">
+                                            <div>
+                                                <p className="text-base font-black text-gray-900 dark:text-white">Abel Abebe</p>
+                                                <p className="text-sm text-blue-600 font-semibold">Senior Product Designer</p>
+                                                <p className="text-xs text-gray-400 mt-0.5">UNIQUE Digital Card</p>
+                                            </div>
+                                            <motion.button className="w-full h-10 bg-gray-900 dark:bg-gray-800 text-white text-xs font-bold rounded-xl flex items-center justify-center gap-2"
+                                                whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                                                <span>💾</span> Save Contact
+                                            </motion.button>
+                                            <button className="w-full h-9 border border-gray-100 dark:border-gray-700 text-gray-600 dark:text-gray-300 text-xs font-medium rounded-xl flex items-center justify-center gap-2">
+                                                <span>🔄</span> Exchange Contact
+                                            </button>
+                                            <div className="flex gap-2.5 pt-1">
+                                                {[
+                                                    { e: '📞', c: 'bg-emerald-50 dark:bg-emerald-900/30 border-emerald-100 dark:border-emerald-800' },
+                                                    { e: '✉️', c: 'bg-blue-50 dark:bg-blue-900/30 border-blue-100 dark:border-blue-800' },
+                                                    { e: '💼', c: 'bg-violet-50 dark:bg-violet-900/30 border-violet-100 dark:border-violet-800' },
+                                                    { e: '🌐', c: 'bg-amber-50 dark:bg-amber-900/30 border-amber-100 dark:border-amber-800' },
+                                                ].map(({ e, c }, i) => (
+                                                    <motion.div key={i}
+                                                        className={`size-10 rounded-full border flex items-center justify-center text-sm cursor-pointer ${c}`}
+                                                        whileHover={{ scale: 1.18, y: -4 }}
+                                                        initial={{ opacity: 0, scale: 0 }}
+                                                        animate={{ opacity: 1, scale: 1 }}
+                                                        transition={{ delay: 1.1 + i * 0.1, type: 'spring' }}
+                                                    >{e}</motion.div>
+                                                ))}
+                                            </div>
+                                            <motion.div
+                                                className="flex items-center gap-2 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-100 dark:border-emerald-800 rounded-xl px-3 py-2"
+                                                animate={{ opacity: [1, 0.6, 1] }} transition={{ duration: 2, repeat: Infinity }}>
+                                                <div className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                                                <span className="text-xs text-emerald-700 dark:text-emerald-400 font-semibold">Card is live</span>
+                                            </motion.div>
+                                        </div>
+                                    </div>
+                                    <div className="absolute bottom-2 left-1/2 -translate-x-1/2 w-20 h-1 bg-white/20 rounded-full z-20" />
+                                </div>
+                            </motion.div>
+
+                            {/* Floating badges — hidden on small screens */}
+                            {BADGES.map((badge, i) => (
+                                <motion.div key={badge.label}
+                                    initial={{ opacity: 0, scale: 0.8 }}
+                                    animate={{ opacity: 1, scale: 1 }}
+                                    transition={{ delay: 1.2 + i * 0.3, type: 'spring', stiffness: 200 }}
+                                    className={`absolute ${badge.pos} z-20 pointer-events-none hidden sm:block`}
+                                >
+                                    <motion.div
+                                        animate={{ y: [0, -6 - i * 1.5, 0] }}
+                                        transition={{ duration: 4 + i, repeat: Infinity, delay: i * 0.8, ease: 'easeInOut' }}
+                                        className="bg-white dark:bg-gray-900 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-800 px-3 py-2.5 min-w-[130px]"
+                                    >
+                                        <div className="flex items-center gap-2">
+                                            <span className="text-lg">{badge.icon}</span>
+                                            <div>
+                                                <p className="text-xs font-bold text-gray-900 dark:text-white leading-none">{badge.label}</p>
+                                                <p className="text-[10px] text-gray-500 mt-0.5">{badge.sub}</p>
+                                            </div>
+                                        </div>
+                                    </motion.div>
+                                </motion.div>
+                            ))}
+                        </div>
                     </motion.div>
                 </div>
 
                 {/* Scroll indicator */}
-                <motion.div
-                    initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 2.5 }}
-                    className="absolute bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 pointer-events-none"
-                >
+                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 2.5 }}
+                    className="absolute bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 pointer-events-none">
                     <span className="text-xs text-gray-400 dark:text-gray-600 tracking-widest uppercase">Scroll</span>
                     <div className="w-5 h-8 rounded-full border-2 border-gray-300 dark:border-gray-700 flex items-start justify-center p-1">
-                        <motion.div
-                            className="w-1.5 h-1.5 rounded-full bg-blue-500"
-                            animate={{ y: [0, 14, 0] }}
-                            transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
-                        />
+                        <motion.div className="w-1.5 h-1.5 rounded-full bg-blue-500"
+                            animate={{ y: [0, 14, 0] }} transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }} />
                     </div>
                 </motion.div>
             </div>
