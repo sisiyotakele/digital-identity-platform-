@@ -201,85 +201,84 @@ export function LandingHero() {
                                     <div className="absolute top-4 left-1/2 -translate-x-1/2 w-[72px] h-[22px] bg-gray-950 rounded-full z-20" />
 
                                     {/* Screen */}
-                                    <div className="absolute inset-[3px] rounded-[2.5rem] overflow-hidden z-10" style={{ background: '#0d1117' }}>
+                                    <div className="absolute inset-[3px] rounded-[2.5rem] overflow-hidden z-10 bg-white">
 
-                                        {/* Card header gradient */}
-                                        <div className="h-[130px] relative overflow-hidden" style={{ background: 'linear-gradient(135deg, #4338ca 0%, #6d28d9 60%, #312e81 100%)' }}>
+                                        {/* Header gradient — fixed height, no overflow avatar */}
+                                        <div className="h-[110px] relative overflow-hidden" style={{ background: 'linear-gradient(135deg, #4338ca 0%, #6d28d9 60%, #312e81 100%)' }}>
                                             <motion.div
                                                 className="absolute inset-0"
                                                 style={{ background: 'radial-gradient(circle at 70% 40%, rgba(255,255,255,0.12) 0%, transparent 55%)' }}
                                                 animate={{ x: [-15, 15, -15] }}
                                                 transition={{ duration: 4, repeat: Infinity }}
                                             />
-                                            {/* UNIQUE badge */}
-                                            <div className="absolute top-3 right-3 bg-white/15 backdrop-blur-sm rounded-lg px-2.5 py-1">
+                                            <div className="absolute top-3 right-3 bg-white/20 backdrop-blur-sm rounded-lg px-2.5 py-1">
                                                 <span className="text-white text-[11px] font-black tracking-[0.1em]">UNIQUE</span>
-                                            </div>
-                                            {/* Avatar */}
-                                            <div className="absolute -bottom-9 left-5">
-                                                <motion.div
-                                                    className="size-[72px] rounded-2xl shadow-xl ring-[3px] ring-white/20 overflow-hidden"
-                                                    style={{ background: 'linear-gradient(135deg, #93c5fd, #c4b5fd)' }}
-                                                    animate={{ rotate: [0, 1.5, -1.5, 0] }}
-                                                    transition={{ duration: 5, repeat: Infinity }}
-                                                >
-                                                    <div className="w-full h-full flex items-center justify-center">
-                                                        <span className="text-[22px] font-black text-white/80">AA</span>
-                                                    </div>
-                                                </motion.div>
                                             </div>
                                         </div>
 
+                                        {/* Avatar — sits below header, NOT overlapping */}
+                                        <div className="px-5 -mt-[36px] mb-3">
+                                            <motion.div
+                                                className="size-[72px] rounded-2xl overflow-hidden border-4 border-white shadow-lg"
+                                                style={{ background: 'linear-gradient(135deg, #e2e8f0, #cbd5e1)' }}
+                                                animate={{ rotate: [0, 1, -1, 0] }}
+                                                transition={{ duration: 5, repeat: Infinity }}
+                                            >
+                                                <div className="w-full h-full flex items-center justify-center">
+                                                    <span className="text-[22px] font-black text-gray-500">AA</span>
+                                                </div>
+                                            </motion.div>
+                                        </div>
+
                                         {/* Card content */}
-                                        <div className="pt-11 px-5 space-y-3.5">
+                                        <div className="px-5 space-y-3">
                                             <div>
-                                                <p className="text-[17px] font-black text-white leading-tight">Abel Abebe</p>
-                                                <p className="text-[13px] text-blue-400 font-semibold mt-0.5">Senior Product Designer</p>
-                                                <p className="text-[11px] text-gray-500 mt-0.5">UNIQUE Digital Card</p>
+                                                <p className="text-[18px] font-black text-gray-900 leading-tight">Abel Abebe</p>
+                                                <p className="text-[13px] text-blue-600 font-semibold mt-0.5">Senior Product Designer</p>
+                                                <p className="text-[11px] text-gray-400 mt-0.5">UNIQUE Digital Card</p>
                                             </div>
 
                                             {/* Save Contact */}
                                             <motion.button
-                                                className="w-full h-11 rounded-2xl text-[13px] font-bold text-white flex items-center justify-center gap-2"
-                                                style={{ background: 'linear-gradient(135deg, #4338ca, #7c3aed)' }}
+                                                className="w-full h-12 rounded-2xl text-[14px] font-bold text-white flex items-center justify-center gap-2 shadow-sm"
+                                                style={{ background: '#111827' }}
                                                 whileHover={{ scale: 1.02 }}
                                                 whileTap={{ scale: 0.98 }}
                                             >
-                                                <span className="text-base">💾</span>
+                                                <span className="text-base">📱</span>
                                                 Save Contact
                                             </motion.button>
 
                                             {/* Exchange Contact */}
-                                            <button className="w-full h-10 rounded-2xl text-[12px] font-medium text-gray-300 flex items-center justify-center gap-2 border border-gray-700 hover:border-gray-500 transition-colors">
+                                            <button className="w-full h-11 rounded-2xl text-[13px] font-medium text-gray-700 flex items-center justify-center gap-2 border-2 border-gray-100 bg-white hover:bg-gray-50 transition-colors">
                                                 <span className="text-sm">🔄</span>
                                                 Exchange Contact
                                             </button>
 
                                             {/* Contact icon circles */}
-                                            <div className="flex gap-3 pt-0.5">
+                                            <div className="flex gap-2.5 pt-0.5">
                                                 {contactIcons.map(({ Icon, color, label }, i) => (
                                                     <motion.div
                                                         key={label}
-                                                        className={`size-[42px] rounded-full ${color} flex items-center justify-center shadow-lg cursor-pointer`}
-                                                        whileHover={{ scale: 1.15, y: -3 }}
+                                                        className={`flex-1 h-12 rounded-2xl ${color}/10 border border-current/20 flex items-center justify-center cursor-pointer`}
+                                                        whileHover={{ scale: 1.08, y: -2 }}
                                                         initial={{ opacity: 0, scale: 0 }}
                                                         animate={{ opacity: 1, scale: 1 }}
                                                         transition={{ delay: 1.0 + i * 0.1, type: 'spring', stiffness: 260 }}
                                                     >
-                                                        <Icon className="size-4 text-white" strokeWidth={2.5} />
+                                                        <Icon className={`size-5 ${color.replace('bg-', 'text-')}`} strokeWidth={2} />
                                                     </motion.div>
                                                 ))}
                                             </div>
 
                                             {/* Live indicator */}
                                             <motion.div
-                                                className="flex items-center gap-2 rounded-xl px-3 py-2 border"
-                                                style={{ background: 'rgba(16,185,129,0.08)', borderColor: 'rgba(16,185,129,0.2)' }}
+                                                className="flex items-center gap-2 rounded-xl px-3 py-2 bg-emerald-50 border border-emerald-100"
                                                 animate={{ opacity: [1, 0.6, 1] }}
                                                 transition={{ duration: 2.5, repeat: Infinity }}
                                             >
-                                                <div className="size-2 rounded-full bg-emerald-400 animate-pulse" />
-                                                <span className="text-[11px] text-emerald-400 font-semibold">Card is live</span>
+                                                <div className="size-2 rounded-full bg-emerald-500 animate-pulse" />
+                                                <span className="text-[11px] text-emerald-700 font-semibold">Card is live</span>
                                             </motion.div>
                                         </div>
                                     </div>
