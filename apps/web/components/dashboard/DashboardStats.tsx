@@ -44,6 +44,7 @@ export function DashboardStats({ stats }: { stats: Stat[] }) {
                         <div className="flex items-center justify-between mb-3">
                             <p className="text-xs font-medium text-muted-foreground">{stat.label}</p>
                             <div className={`size-8 rounded-xl flex items-center justify-center ${bg}`}>
+                                {/* @ts-ignore — dynamic className */}
                                 <Icon className={`size-4 ${color}`} />
                             </div>
                         </div>

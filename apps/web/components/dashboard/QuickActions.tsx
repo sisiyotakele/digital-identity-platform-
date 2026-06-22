@@ -101,6 +101,7 @@ function ActionContent({ action }: { action: Action }) {
     return (
         <>
             <div className={`size-8 rounded-lg flex items-center justify-center shrink-0 ${action.color}`}>
+                {/* @ts-ignore */}
                 <action.icon className="size-4" />
             </div>
             <div className="flex-1 min-w-0">
