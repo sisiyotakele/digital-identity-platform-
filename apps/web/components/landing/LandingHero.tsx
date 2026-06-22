@@ -2,26 +2,26 @@
 
 import Link from 'next/link'
 import { useState, useEffect } from 'react'
-import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion'
-import { ArrowRight, Sparkles, Shield, Zap, Users, Play, CheckCircle } from 'lucide-react'
+import { motion, useScroll, useTransform } from 'framer-motion'
+import { ArrowRight, Sparkles, Shield, Zap, Users, Play, CheckCircle, Phone, Mail, Briefcase, Globe, Wifi } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
 const TYPED_WORDS = ['Abel Abebe', 'Sara Tesfaye', 'Dawit Bekele', 'Hana Girma', 'Yonas Haile']
 
-const PARTICLES = Array.from({ length: 25 }, (_, i) => ({
+const PARTICLES = Array.from({ length: 22 }, (_, i) => ({
     id: i,
     x: Math.random() * 100,
     y: Math.random() * 100,
     size: Math.random() * 3 + 1,
     delay: Math.random() * 5,
     duration: Math.random() * 8 + 6,
-    opacity: Math.random() * 0.35 + 0.1,
+    opacity: Math.random() * 0.3 + 0.08,
 }))
 
 const BADGES = [
-    { icon: '✅', label: 'Contact Saved', sub: 'just now', pos: '-left-4 sm:-left-16 top-16' },
-    { icon: '👀', label: '247 views', sub: 'today', pos: '-right-4 sm:-right-14 top-1/3' },
-    { icon: '📡', label: 'NFC Tap!', sub: 'Card shared', pos: '-left-2 sm:-left-12 bottom-20' },
+    { icon: CheckCircle, label: 'Contact Saved', sub: 'just now', pos: 'sm:-left-20 top-14', color: 'text-emerald-500', bg: 'bg-emerald-500' },
+    { icon: Users, label: '247 views', sub: 'today', pos: 'sm:-right-16 top-1/3', color: 'text-blue-500', bg: 'bg-blue-500' },
+    { icon: Wifi, label: 'NFC Tap!', sub: 'Card shared', pos: 'sm:-left-14 bottom-24', color: 'text-violet-500', bg: 'bg-violet-500' },
 ]
 
 export function LandingHero() {
@@ -46,6 +46,13 @@ export function LandingHero() {
         }
         return () => clearTimeout(t)
     }, [displayText, isDeleting, typedIndex])
+
+    const contactIcons = [
+        { Icon: Phone, color: 'bg-emerald-500', label: 'Call' },
+        { Icon: Mail, color: 'bg-blue-500', label: 'Email' },
+        { Icon: Briefcase, color: 'bg-violet-500', label: 'LinkedIn' },
+        { Icon: Globe, color: 'bg-amber-500', label: 'Website' },
+    ]
 
     return (
         <section className="relative min-h-screen flex items-center overflow-hidden bg-white dark:bg-gray-950 pt-[68px]">
@@ -77,11 +84,10 @@ export function LandingHero() {
                         key={p.id}
                         className="absolute rounded-full bg-indigo-400 dark:bg-indigo-300"
                         style={{ left: `${p.x}%`, top: `${p.y}%`, width: p.size, height: p.size, opacity: p.opacity }}
-                        animate={{ y: [-20, 20, -20], x: [-10, 10, -10], opacity: [p.opacity, p.opacity * 2.5, p.opacity] }}
+                        animate={{ y: [-20, 20, -20], x: [-10, 10, -10] }}
                         transition={{ duration: p.duration, repeat: Infinity, delay: p.delay, ease: 'easeInOut' }}
                     />
                 ))}
-                {/* Spinning rings */}
                 <motion.div className="absolute top-20 left-8 w-56 h-56 rounded-full border border-blue-200/15 dark:border-blue-800/15"
                     animate={{ rotate: 360 }} transition={{ duration: 28, repeat: Infinity, ease: 'linear' }} />
                 <motion.div className="absolute bottom-24 right-8 w-40 h-40 rounded-full border border-violet-200/15 dark:border-violet-800/15"
@@ -91,7 +97,7 @@ export function LandingHero() {
             <div className="relative max-w-7xl mx-auto px-4 sm:px-6 py-10 lg:py-16 w-full">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-6 items-center">
 
-                    {/* Left */}
+                    {/* ── Left: Copy ─────────────────────────── */}
                     <div className="space-y-7 relative z-10">
                         <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}>
                             <motion.div
@@ -105,19 +111,17 @@ export function LandingHero() {
                             </motion.div>
 
                             <h1 className="text-5xl sm:text-6xl lg:text-[58px] font-black leading-[1.05] tracking-tight text-gray-900 dark:text-white">
-                                {['Make every', 'first impression', 'unforgettable.'].map((line, i) => (
+                                {(['Make every', 'first impression', 'unforgettable.'] as const).map((line, i) => (
                                     <motion.span key={line}
                                         className={`block ${i === 1 ? 'bg-gradient-to-r from-blue-600 via-violet-500 to-blue-600 bg-clip-text text-transparent bg-[length:200%_auto] animate-gradient' : ''}`}
                                         initial={{ opacity: 0, x: -30 }} animate={{ opacity: 1, x: 0 }}
                                         transition={{ duration: 0.5, delay: 0.1 + i * 0.1 }}
-                                    >
-                                        {line}
-                                    </motion.span>
+                                    >{line}</motion.span>
                                 ))}
                             </h1>
 
                             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.55 }}
-                                className="mt-4 flex items-center gap-2 text-base text-gray-500 dark:text-gray-400 flex-wrap">
+                                className="mt-4 flex flex-wrap items-center gap-2 text-base text-gray-500 dark:text-gray-400">
                                 <span>Used by</span>
                                 <span className="font-bold text-gray-900 dark:text-white min-w-[150px]">
                                     {displayText}<span className="animate-blink text-blue-500">|</span>
@@ -166,121 +170,145 @@ export function LandingHero() {
                                 <motion.div key={label} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }}
                                     transition={{ delay: 0.65 + i * 0.1 }}
                                     className="flex items-center gap-1.5 text-sm text-gray-500 dark:text-gray-400">
-                                    <CheckCircle className={`size-4 ${color}`} />
+                                    <Icon className={`size-4 ${color}`} />
                                     {label}
                                 </motion.div>
                             ))}
                         </motion.div>
                     </div>
 
-                    {/* Right — phone mockup */}
-                    <motion.div style={{ y: phoneY }} className="relative flex justify-center lg:justify-end mt-8 lg:mt-0 z-10">
+                    {/* ── Right: Phone mockup ─────────────────── */}
+                    <motion.div style={{ y: phoneY }} className="relative flex justify-center lg:justify-end mt-6 lg:mt-0 z-10">
                         <div className="relative scale-90 sm:scale-100">
                             {/* Glow */}
                             <motion.div
                                 className="absolute inset-0 rounded-[3rem] blur-3xl"
-                                style={{ background: 'radial-gradient(circle, rgba(99,102,241,0.35) 0%, rgba(59,130,246,0.15) 60%, transparent 80%)' }}
-                                animate={{ scale: [1, 1.1, 1], opacity: [0.6, 1, 0.6] }}
+                                style={{ background: 'radial-gradient(circle, rgba(99,102,241,0.30) 0%, rgba(59,130,246,0.12) 60%, transparent 80%)' }}
+                                animate={{ scale: [1, 1.1, 1], opacity: [0.5, 0.9, 0.5] }}
                                 transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
                             />
 
-                            {/* Phone */}
+                            {/* Phone frame */}
                             <motion.div
                                 animate={{ y: [0, -12, 0] }}
                                 transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
-                                className="relative"
                             >
                                 <div className="relative w-[260px] sm:w-[280px] h-[520px] sm:h-[560px]">
-                                    <div className="absolute inset-0 rounded-[2.8rem] bg-gradient-to-b from-gray-800 to-gray-900 shadow-2xl shadow-black/60" />
+                                    {/* Outer casing */}
+                                    <div className="absolute inset-0 rounded-[2.8rem] bg-gradient-to-b from-gray-700 to-gray-900 shadow-2xl shadow-black/70" />
                                     <div className="absolute inset-[2px] rounded-[2.7rem] bg-gray-950" />
-                                    <div className="absolute top-4 left-1/2 -translate-x-1/2 w-20 h-5 bg-gray-900 rounded-full z-20" />
+                                    {/* Notch */}
+                                    <div className="absolute top-4 left-1/2 -translate-x-1/2 w-[72px] h-[22px] bg-gray-950 rounded-full z-20" />
 
                                     {/* Screen */}
-                                    <div className="absolute inset-[3px] rounded-[2.5rem] overflow-hidden z-10 bg-white dark:bg-gray-900">
-                                        {/* Header */}
-                                        <div className="h-32 bg-gradient-to-br from-blue-600 via-violet-600 to-indigo-700 relative overflow-hidden">
+                                    <div className="absolute inset-[3px] rounded-[2.5rem] overflow-hidden z-10" style={{ background: '#0d1117' }}>
+
+                                        {/* Card header gradient */}
+                                        <div className="h-[130px] relative overflow-hidden" style={{ background: 'linear-gradient(135deg, #4338ca 0%, #6d28d9 60%, #312e81 100%)' }}>
                                             <motion.div
                                                 className="absolute inset-0"
-                                                style={{ background: 'radial-gradient(circle at 70% 50%, rgba(255,255,255,0.12) 0%, transparent 60%)' }}
-                                                animate={{ x: [-20, 20, -20] }}
+                                                style={{ background: 'radial-gradient(circle at 70% 40%, rgba(255,255,255,0.12) 0%, transparent 55%)' }}
+                                                animate={{ x: [-15, 15, -15] }}
                                                 transition={{ duration: 4, repeat: Infinity }}
                                             />
-                                            <div className="absolute -bottom-10 left-6">
+                                            {/* UNIQUE badge */}
+                                            <div className="absolute top-3 right-3 bg-white/15 backdrop-blur-sm rounded-lg px-2.5 py-1">
+                                                <span className="text-white text-[11px] font-black tracking-[0.1em]">UNIQUE</span>
+                                            </div>
+                                            {/* Avatar */}
+                                            <div className="absolute -bottom-9 left-5">
                                                 <motion.div
-                                                    className="size-20 rounded-2xl bg-white shadow-xl ring-4 ring-white overflow-hidden"
-                                                    animate={{ rotate: [0, 2, -2, 0] }}
-                                                    transition={{ duration: 4, repeat: Infinity }}
+                                                    className="size-[72px] rounded-2xl shadow-xl ring-[3px] ring-white/20 overflow-hidden"
+                                                    style={{ background: 'linear-gradient(135deg, #93c5fd, #c4b5fd)' }}
+                                                    animate={{ rotate: [0, 1.5, -1.5, 0] }}
+                                                    transition={{ duration: 5, repeat: Infinity }}
                                                 >
-                                                    <div className="w-full h-full bg-gradient-to-br from-blue-100 to-violet-100 flex items-center justify-center">
-                                                        <span className="text-2xl font-black text-blue-600">AA</span>
+                                                    <div className="w-full h-full flex items-center justify-center">
+                                                        <span className="text-[22px] font-black text-white/80">AA</span>
                                                     </div>
                                                 </motion.div>
                                             </div>
-                                            <div className="absolute top-3 right-3 bg-white/20 backdrop-blur-sm rounded-lg px-2 py-1">
-                                                <span className="text-white text-xs font-black tracking-wider">UNIQUE</span>
-                                            </div>
                                         </div>
 
-                                        <div className="pt-12 px-5 space-y-3">
+                                        {/* Card content */}
+                                        <div className="pt-11 px-5 space-y-3.5">
                                             <div>
-                                                <p className="text-base font-black text-gray-900 dark:text-white">Abel Abebe</p>
-                                                <p className="text-sm text-blue-600 font-semibold">Senior Product Designer</p>
-                                                <p className="text-xs text-gray-400 mt-0.5">UNIQUE Digital Card</p>
+                                                <p className="text-[17px] font-black text-white leading-tight">Abel Abebe</p>
+                                                <p className="text-[13px] text-blue-400 font-semibold mt-0.5">Senior Product Designer</p>
+                                                <p className="text-[11px] text-gray-500 mt-0.5">UNIQUE Digital Card</p>
                                             </div>
-                                            <motion.button className="w-full h-10 bg-gray-900 dark:bg-gray-800 text-white text-xs font-bold rounded-xl flex items-center justify-center gap-2"
-                                                whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                                                <span>💾</span> Save Contact
+
+                                            {/* Save Contact */}
+                                            <motion.button
+                                                className="w-full h-11 rounded-2xl text-[13px] font-bold text-white flex items-center justify-center gap-2"
+                                                style={{ background: 'linear-gradient(135deg, #4338ca, #7c3aed)' }}
+                                                whileHover={{ scale: 1.02 }}
+                                                whileTap={{ scale: 0.98 }}
+                                            >
+                                                <span className="text-base">💾</span>
+                                                Save Contact
                                             </motion.button>
-                                            <button className="w-full h-9 border border-gray-100 dark:border-gray-700 text-gray-600 dark:text-gray-300 text-xs font-medium rounded-xl flex items-center justify-center gap-2">
-                                                <span>🔄</span> Exchange Contact
+
+                                            {/* Exchange Contact */}
+                                            <button className="w-full h-10 rounded-2xl text-[12px] font-medium text-gray-300 flex items-center justify-center gap-2 border border-gray-700 hover:border-gray-500 transition-colors">
+                                                <span className="text-sm">🔄</span>
+                                                Exchange Contact
                                             </button>
-                                            <div className="flex gap-2.5 pt-1">
-                                                {[
-                                                    { e: '📞', c: 'bg-emerald-50 dark:bg-emerald-900/30 border-emerald-100 dark:border-emerald-800' },
-                                                    { e: '✉️', c: 'bg-blue-50 dark:bg-blue-900/30 border-blue-100 dark:border-blue-800' },
-                                                    { e: '💼', c: 'bg-violet-50 dark:bg-violet-900/30 border-violet-100 dark:border-violet-800' },
-                                                    { e: '🌐', c: 'bg-amber-50 dark:bg-amber-900/30 border-amber-100 dark:border-amber-800' },
-                                                ].map(({ e, c }, i) => (
-                                                    <motion.div key={i}
-                                                        className={`size-10 rounded-full border flex items-center justify-center text-sm cursor-pointer ${c}`}
-                                                        whileHover={{ scale: 1.18, y: -4 }}
+
+                                            {/* Contact icon circles */}
+                                            <div className="flex gap-3 pt-0.5">
+                                                {contactIcons.map(({ Icon, color, label }, i) => (
+                                                    <motion.div
+                                                        key={label}
+                                                        className={`size-[42px] rounded-full ${color} flex items-center justify-center shadow-lg cursor-pointer`}
+                                                        whileHover={{ scale: 1.15, y: -3 }}
                                                         initial={{ opacity: 0, scale: 0 }}
                                                         animate={{ opacity: 1, scale: 1 }}
-                                                        transition={{ delay: 1.1 + i * 0.1, type: 'spring' }}
-                                                    >{e}</motion.div>
+                                                        transition={{ delay: 1.0 + i * 0.1, type: 'spring', stiffness: 260 }}
+                                                    >
+                                                        <Icon className="size-4 text-white" strokeWidth={2.5} />
+                                                    </motion.div>
                                                 ))}
                                             </div>
+
+                                            {/* Live indicator */}
                                             <motion.div
-                                                className="flex items-center gap-2 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-100 dark:border-emerald-800 rounded-xl px-3 py-2"
-                                                animate={{ opacity: [1, 0.6, 1] }} transition={{ duration: 2, repeat: Infinity }}>
-                                                <div className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                                                <span className="text-xs text-emerald-700 dark:text-emerald-400 font-semibold">Card is live</span>
+                                                className="flex items-center gap-2 rounded-xl px-3 py-2 border"
+                                                style={{ background: 'rgba(16,185,129,0.08)', borderColor: 'rgba(16,185,129,0.2)' }}
+                                                animate={{ opacity: [1, 0.6, 1] }}
+                                                transition={{ duration: 2.5, repeat: Infinity }}
+                                            >
+                                                <div className="size-2 rounded-full bg-emerald-400 animate-pulse" />
+                                                <span className="text-[11px] text-emerald-400 font-semibold">Card is live</span>
                                             </motion.div>
                                         </div>
                                     </div>
-                                    <div className="absolute bottom-2 left-1/2 -translate-x-1/2 w-20 h-1 bg-white/20 rounded-full z-20" />
+
+                                    {/* Home bar */}
+                                    <div className="absolute bottom-2 left-1/2 -translate-x-1/2 w-[72px] h-1 bg-white/20 rounded-full z-20" />
                                 </div>
                             </motion.div>
 
-                            {/* Floating badges — hidden on small screens */}
+                            {/* Floating badges — only on sm+ */}
                             {BADGES.map((badge, i) => (
-                                <motion.div key={badge.label}
+                                <motion.div
+                                    key={badge.label}
                                     initial={{ opacity: 0, scale: 0.8 }}
                                     animate={{ opacity: 1, scale: 1 }}
                                     transition={{ delay: 1.2 + i * 0.3, type: 'spring', stiffness: 200 }}
                                     className={`absolute ${badge.pos} z-20 pointer-events-none hidden sm:block`}
                                 >
                                     <motion.div
-                                        animate={{ y: [0, -6 - i * 1.5, 0] }}
+                                        animate={{ y: [0, -5 - i * 1.5, 0] }}
                                         transition={{ duration: 4 + i, repeat: Infinity, delay: i * 0.8, ease: 'easeInOut' }}
-                                        className="bg-white dark:bg-gray-900 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-800 px-3 py-2.5 min-w-[130px]"
+                                        className="flex items-center gap-2.5 bg-gray-900/95 backdrop-blur-sm border border-gray-700 rounded-2xl shadow-xl px-3 py-2.5 min-w-[130px]"
                                     >
-                                        <div className="flex items-center gap-2">
-                                            <span className="text-lg">{badge.icon}</span>
-                                            <div>
-                                                <p className="text-xs font-bold text-gray-900 dark:text-white leading-none">{badge.label}</p>
-                                                <p className="text-[10px] text-gray-500 mt-0.5">{badge.sub}</p>
-                                            </div>
+                                        <div className={`size-7 rounded-lg ${badge.bg} flex items-center justify-center shrink-0`}>
+                                            <badge.icon className="size-3.5 text-white" />
+                                        </div>
+                                        <div>
+                                            <p className="text-xs font-bold text-white leading-none">{badge.label}</p>
+                                            <p className="text-[10px] text-gray-400 mt-0.5">{badge.sub}</p>
                                         </div>
                                     </motion.div>
                                 </motion.div>
@@ -292,7 +320,7 @@ export function LandingHero() {
                 {/* Scroll indicator */}
                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 2.5 }}
                     className="absolute bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 pointer-events-none">
-                    <span className="text-xs text-gray-400 dark:text-gray-600 tracking-widest uppercase">Scroll</span>
+                    <span className="text-[10px] text-gray-400 dark:text-gray-600 tracking-widest uppercase font-medium">Scroll</span>
                     <div className="w-5 h-8 rounded-full border-2 border-gray-300 dark:border-gray-700 flex items-start justify-center p-1">
                         <motion.div className="w-1.5 h-1.5 rounded-full bg-blue-500"
                             animate={{ y: [0, 14, 0] }} transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }} />
