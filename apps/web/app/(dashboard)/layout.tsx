@@ -40,23 +40,23 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         (pathname.includes('/edit') ? 'Edit Card' : pageTitles['/dashboard'])
 
     return (
-        <div className="min-h-screen flex bg-background">
-            {/* Desktop sidebar — hidden on mobile */}
-            <div className="hidden md:block md:w-64 shrink-0">
+        <div className="h-screen flex overflow-hidden bg-background">
+            {/* Desktop sidebar — fixed height, never scrolls */}
+            <div className="hidden md:flex md:w-64 shrink-0 h-screen">
                 <Sidebar />
             </div>
 
             {/* Mobile sidebar drawer */}
             <MobileSidebar open={mobileOpen} onClose={() => setMobileOpen(false)} />
 
-            {/* Main content area */}
-            <div className="flex-1 flex flex-col min-w-0 w-full">
+            {/* Main content area — scrolls independently */}
+            <div className="flex-1 flex flex-col min-w-0 h-screen overflow-hidden">
                 <TopNav
                     profile={profile}
                     onMenuClick={() => setMobileOpen(true)}
                     title={title}
                 />
-                <main className="flex-1 overflow-x-hidden">
+                <main className="flex-1 overflow-y-auto overflow-x-hidden">
                     {children}
                 </main>
             </div>

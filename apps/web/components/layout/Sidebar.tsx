@@ -6,6 +6,7 @@ import { motion } from 'framer-motion'
 import { LayoutDashboard, CreditCard, BarChart2, Settings, Printer, ExternalLink, LogOut } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Logo } from '@/components/brand/Logo'
+import { Dock } from '@/components/ui/Dock'
 import { createClient } from '@/lib/supabase/client'
 import { toast } from 'sonner'
 
@@ -28,14 +29,23 @@ export function Sidebar() {
         router.push('/login')
     }
 
+    const dockItems = navItems.map(({ href, label, icon: Icon }) => ({
+        icon: <Icon className="size-4" />,
+        label,
+        onClick: () => router.push(href),
+        className: pathname === href || (href !== '/dashboard' && pathname.startsWith(href)) ? 'ring-2 ring-primary/50' : '',
+    }))
+
     return (
-        <aside className="w-64 flex-shrink-0 flex flex-col h-screen sticky top-0 border-r border-border bg-card">
-            <div className="h-16 flex items-center px-5 border-b border-border">
+        <aside className="w-64 flex-shrink-0 flex flex-col h-full border-r border-border bg-card overflow-hidden">
+            {/* Logo */}
+            <div className="h-16 flex items-center px-5 border-b border-border shrink-0">
                 <Link href="/dashboard">
                     <Logo size="sm" />
                 </Link>
             </div>
 
+            {/* Nav links */}
             <nav className="flex-1 px-3 py-5 space-y-0.5 overflow-y-auto">
                 {navItems.map(({ href, label, icon: Icon }) => {
                     const active = pathname === href || (href !== '/dashboard' && pathname.startsWith(href))
@@ -45,9 +55,7 @@ export function Sidebar() {
                             href={href}
                             className={cn(
                                 'relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150',
-                                active
-                                    ? 'text-primary-foreground'
-                                    : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+                                active ? 'text-primary-foreground' : 'text-muted-foreground hover:text-foreground hover:bg-muted'
                             )}
                         >
                             {active && (
@@ -64,23 +72,38 @@ export function Sidebar() {
                 })}
             </nav>
 
-            <div className="p-3 space-y-1 border-t border-border">
-                <a
-                    href="/"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground transition-colors px-3 py-2 rounded-xl hover:bg-muted"
-                >
-                    <ExternalLink className="size-3.5" />
-                    Visit homepage
-                </a>
-                <button
-                    onClick={handleLogout}
-                    className="w-full flex items-center gap-2 text-xs text-muted-foreground hover:text-destructive transition-colors px-3 py-2 rounded-xl hover:bg-destructive/10 text-left"
-                >
-                    <LogOut className="size-3.5" />
-                    Sign out
-                </button>
+            {/* Bottom — Dock + footer links */}
+            <div className="shrink-0 border-t border-border">
+                {/* Dock — macOS-style magnifying dock */}
+                <div className="relative h-20 flex items-end justify-center overflow-visible pb-1">
+                    <Dock
+                        items={dockItems}
+                        panelHeight={52}
+                        baseItemSize={36}
+                        magnification={52}
+                        distance={150}
+                    />
+                </div>
+
+                {/* Footer links */}
+                <div className="px-3 pb-3 space-y-0.5">
+                    <a
+                        href="/"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground transition-colors px-3 py-2 rounded-xl hover:bg-muted"
+                    >
+                        <ExternalLink className="size-3.5 shrink-0" />
+                        Visit homepage
+                    </a>
+                    <button
+                        onClick={handleLogout}
+                        className="w-full flex items-center gap-2 text-xs text-muted-foreground hover:text-destructive transition-colors px-3 py-2 rounded-xl hover:bg-destructive/10 text-left"
+                    >
+                        <LogOut className="size-3.5 shrink-0" />
+                        Sign out
+                    </button>
+                </div>
             </div>
         </aside>
     )

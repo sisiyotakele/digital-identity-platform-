@@ -76,7 +76,7 @@ export default function AnalyticsPage() {
                 <select
                     value={selectedCard}
                     onChange={(e) => setSelectedCard(e.target.value)}
-                    className="h-8 rounded-lg border border-input bg-white px-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                    className="h-8 rounded-lg border border-input bg-background text-foreground px-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 >
                     <option value="all">All cards</option>
                     {cards.map((c) => (
@@ -89,8 +89,7 @@ export default function AnalyticsPage() {
                         <button
                             key={r.value}
                             onClick={() => setDays(r.value)}
-                            className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${days === r.value ? 'bg-white shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground'
-                                }`}
+                            className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${days === r.value ? 'bg-card shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
                         >
                             {r.label}
                         </button>

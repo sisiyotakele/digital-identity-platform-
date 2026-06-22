@@ -37,8 +37,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <body className="font-sans antialiased">
                 <ThemeProvider
                     attribute="class"
-                    defaultTheme="light"
-                    enableSystem
+                    defaultTheme="dark"
+                    enableSystem={false}
                     disableTransitionOnChange={false}
                 >
                     {children}

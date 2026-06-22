@@ -94,7 +94,7 @@ export default function OnboardingPage() {
                         animate={{ opacity: 1, x: 0 }}
                         exit={{ opacity: 0, x: -20 }}
                         transition={{ duration: 0.25 }}
-                        className="bg-white dark:bg-gray-900 rounded-3xl border border-gray-200 dark:border-gray-800 p-8 shadow-sm space-y-6"
+                        className="bg-card border border-border rounded-3xl p-8 shadow-sm space-y-6"
                     >
                         <div className="flex items-center gap-3">
                             <div
